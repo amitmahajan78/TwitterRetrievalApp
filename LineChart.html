@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script>
+
+        window.onload = function () {
+
+            axios.get('http://localhost:8080/v2/stream/scores/type?id=Negative')
+                .then(negativeRes => {
+                    console.log(negativeRes.data);
+
+                    axios.get('http://localhost:8080/v2/stream/scores/type?id=Positive')
+                        .then(positiveRes => {
+                            console.log(positiveRes.data);
+
+                            axios.get('http://localhost:8080/v2/stream/scores/type?id=Neutral')
+                                .then(neutralRes => {
+                                    console.log(neutralRes.data);
+
+                                    axios.get('http://localhost:8080/v2/stream/scores/type?id=Mixed')
+                                        .then(mixedRes => {
+                                            console.log(mixedRes.data);
+
+
+                                            var chart = new CanvasJS.Chart("chartContainer", {
+                                                animationEnabled: true,
+                                                theme: "light2",
+                                                title: {
+                                                    text: "Sentiment analysis data in last few hours"
+                                                },
+                                                axisX: {
+                                                    title: "Hours",
+                                                    valueFormatString: "",
+                                                    crosshair: {
+                                                        enabled: true,
+                                                        snapToDataPoint: true
+                                                    }
+                                                },
+                                                axisY: {
+                                                    title: "Sentiment Score",
+                                                    crosshair: {
+                                                        enabled: true
+                                                    }
+                                                },
+                                                toolTip: {
+                                                    shared: true
+                                                },
+                                                legend: {
+                                                    cursor: "pointer",
+                                                    verticalAlign: "bottom",
+                                                    horizontalAlign: "left",
+                                                    dockInsidePlotArea: true,
+                                                    itemclick: toogleDataSeries
+                                                },
+                                                data: [{
+                                                    type: "line",
+                                                    showInLegend: true,
+                                                    name: "Negative",
+                                                    markerType: "square",
+                                                    xValueFormatString: "",
+                                                    color: "#F08080",
+                                                    lineDashType: "shortDot",
+                                                    dataPoints: negativeRes.data
+                                                },
+                                                {
+                                                    type: "line",
+                                                    showInLegend: true,
+                                                    name: "Mixed",
+                                                    lineDashType: "dot",
+                                                    dataPoints: mixedRes.data
+                                                },
+                                                {
+                                                    type: "line",
+                                                    showInLegend: true,
+                                                    name: "Positive",
+                                                    lineDashType: "solid",
+                                                    dataPoints: positiveRes.data
+                                                },
+                                                {
+                                                    type: "line",
+                                                    showInLegend: true,
+                                                    name: "Neutral",
+                                                    lineDashType: "dash",
+                                                    dataPoints: neutralRes.data
+                                                }
+                                                ]
+                                            });
+                                            chart.render();
+
+                                            function toogleDataSeries(e) {
+                                                if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                                                    e.dataSeries.visible = false;
+                                                } else {
+                                                    e.dataSeries.visible = true;
+                                                }
+                                                chart.render();
+                                            }
+                                        });
+                                });
+                        });
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</body>
+
+</html>
